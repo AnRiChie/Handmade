@@ -1,5 +1,5 @@
 import matplotlib.pyplot as pip
-with open('potential.xvg', 'r') as op:
+with open(input(), 'r') as op:
     read = op.readlines()
 i = 0    
 read = [i.strip().split() for i in read]
