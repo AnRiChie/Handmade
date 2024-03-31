@@ -1,26 +1,38 @@
 import openbabel as obab
 
-# Creates input pattern for script
-input = input('input_file SMARTS_pattern output_file\n').split()
-file, pattern = input[0], input[1]
+# Create module function that saves set containing residues with input pattern
+def smarts_match(file, pattern):
+    # Converts any type of file to .smi format
+    conv = obab.OBConversion()
+    conv.SetOutFormat('smi')        # more readable
 
-# Converts any type of file to .smi format
-conv = obab.OBConversion()
-conv.SetOutFormat('smi')        # more readable
+    # Reads input file and store the SMILES string in variable
+    mol = obab.OBMol()
+    conv.ReadFile(mol, file)
 
-# Reads input file and store the SMILES string in variable
-mol = obab.OBMol()
-conv.ReadFile(mol, file)
+    # Creates set to store residues with rings
+    residues = set()                # not only with rings anymore
 
-# Creates set to store residues with rings
-residueswrings = set()
+    # Iterates through each atom in every peptide's residue, applying SMARTS-pattern to them
+    for atom in obab.OBMolAtomIter(mol):
+        if atom.MatchesSMARTS(pattern):
+            residues.add(atom.GetResidue().GetName())
+    return residues
 
-# Iterates through each atom in every peptide's residue, applying SMARTS-pattern to them
-for atom in obab.OBMolAtomIter(mol):
-    if atom.MatchesSMARTS(pattern):
-        residueswrings.add(atom.GetResidue().GetName())
+# Create private function of root program script
+def __main():
+    # Creates input pattern for script
+    input_pat = input('input_file SMARTS_pattern output_file\n').split()
+    file, pattern = input_pat[0], input_pat[1]
 
-# Manages our output
-if len(input) == 3:
-    with open(input[2], 'w') as out: out.writelines(' '.join(residueswrings))
-else: print(*residueswrings)
+    # Now able to find rings with function (if pattern = '[r5,r6]')
+    residueswrings = smarts_match(file, pattern)
+
+    # Manages our output
+    if len(input_pat) == 3:
+        with open(input_pat[2], 'w') as out: out.writelines(' '.join(residueswrings))
+    else: print(*residueswrings)
+
+# Code performes only if root program is executed
+if __name__ == '__main__':
+    __main()
