@@ -1,25 +1,26 @@
 import openbabel as obab
 
-file = input()
+# Creates input pattern for script
+input = input('input_file SMARTS_pattern output_file\n').split()
+file, pattern = input[0], input[1]
 
 # Converts any type of file to .smi format
 conv = obab.OBConversion()
-conv.SetInFormat(file[file.find('.') + 1:])
+conv.SetOutFormat('smi')        # more readable
 
 # Reads input file and store the SMILES string in variable
 mol = obab.OBMol()
 conv.ReadFile(mol, file)
-
-# Make SMARTS-patterns for aromatic and heterocycles
-arom_rings = "[#6]1:[#6]:[#6]:[#6]:[#6]:[#6]:1"
-heterocyc = "[#6,#7]1~[#6,#7]~[#6,#7]~[#6,#7]~[#6,#7]~1"
 
 # Creates set to store residues with rings
 residueswrings = set()
 
 # Iterates through each atom in every peptide's residue, applying SMARTS-pattern to them
 for atom in obab.OBMolAtomIter(mol):
-    if atom.MatchesSMARTS(arom_rings) or atom.MatchesSMARTS(heterocyc):
+    if atom.MatchesSMARTS(pattern):
         residueswrings.add(atom.GetResidue().GetName())
 
-print(*residueswrings)
+# Manages our output
+if len(input) == 3:
+    with open(input[2], 'w') as out: out.writelines(' '.join(residueswrings))
+else: print(*residueswrings)
