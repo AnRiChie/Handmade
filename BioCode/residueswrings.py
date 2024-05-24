@@ -1,14 +1,14 @@
 import openbabel as obab
 
 # Create module function that saves set containing residues with input pattern
-def match_res_inf(file, pattern):
+def match_res_inf(input_file, pattern):
     # Converts any type of file to .smi format
     conv = obab.OBConversion()
     conv.SetOutFormat('smi')        # more readable
 
     # Reads input file and store the SMILES string in variable
     mol = obab.OBMol()
-    conv.ReadFile(mol, file)
+    conv.ReadFile(mol, input_file)
 
     # Creates set to store residues with rings
     residues = set()                # not only with rings anymore
@@ -23,10 +23,10 @@ def match_res_inf(file, pattern):
 def main():
     # Creates input pattern for script
     input_pat = input('input_file SMARTS_pattern output_file\n').split()
-    file, pattern = input_pat[0], input_pat[1]
+    input_file, pattern = input_pat[0], input_pat[1]
 
     # Now able to find rings with function (if pattern = '[r5,r6]')
-    residueswrings = match_res_inf(file, pattern)
+    residueswrings = match_res_inf(input_file, pattern)
 
     # Manages our output
     if len(input_pat) == 3:
