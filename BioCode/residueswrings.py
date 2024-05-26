@@ -1,4 +1,5 @@
 import openbabel as obab
+import sys
 
 # Create module function that saves list containing indeces of residues with input pattern
 def match_res(input_file, pattern):
@@ -46,16 +47,25 @@ def res_inf(input_file, pattern):
 # Create private function of root program script
 def main():
     # Creates input pattern for script
-    input_pat = input('input_file SMARTS_pattern output_file\n').split()
+    input_pat = sys.argv[1:]                                      # remade input to set arguments directly
     input_file, pattern = input_pat[0], input_pat[1]
 
     # Now able to find rings with function (if pattern = '[r5,r6]')
-    residueswrings = match_res(input_file, pattern)
+    residueswrings = res_inf(input_file, pattern)
+
+    # Convert our output into string content
+    for i in range(len(residueswrings)): 
+        if len(residueswrings[i]) == 1:
+            residueswrings[i] = str(residueswrings[i][0])
+        else:
+            residueswrings[i][0] = str(residueswrings[i][0])
+            residueswrings[i] = '\t'.join(residueswrings[i])
+    residueswrings = '\n'.join(residueswrings)
 
     # Manages our output
     if len(input_pat) == 3:
-        with open(input_pat[2], 'w') as out: out.writelines(' '.join(residueswrings))
-    else: print(*residueswrings)
+        with open(input_pat[2], 'w') as out: out.writelines(residueswrings)
+    else: print(residueswrings)
 
 # Code performes only if root program is executed
 if __name__ == '__main__':
