@@ -25,6 +25,24 @@ def match_res(input_file, pattern):
     residues = sorted(list(residues))
     return residues
 
+def res_inf(input_file, pattern):
+    conv = obab.OBConversion()
+    conv.SetInFormat(conv.FormatFromExt(input_file))
+
+    mol = obab.OBMol()
+    conv.ReadFile(mol, input_file)
+
+    residues = []
+
+    # Iterates through each atom in every peptide's residue, applying SMARTS-pattern to them
+    for res in match_res(input_file, pattern):
+        res = mol.GetResidue(res)
+        residues.append([res.GetName()])                          # writes the rest of information of
+        chain = res.GetChain()                                    # residue if rest_inf=True
+        if (chain != 'A' and chain != None):
+            residues[-1].append(chain)
+    return residues
+
 # Create private function of root program script
 def main():
     # Creates input pattern for script
