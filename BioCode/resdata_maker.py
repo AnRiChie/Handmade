@@ -21,12 +21,13 @@ def res_inf(input_file):
 
             # Builds up each unit adding atom data in first list
             for atom in obab.OBResidueAtomIter(res):
-                atom_str = f'ATOM {atom.GetAtomicNum()} {atom.GetType()} {atom.GetHyb()}'
+                atom_str = f'ATOM {atom.GetResidue().GetAtomID(atom)} {atom.GetType()} {atom.GetHyb()}'
                 residues[res_name][0].append(atom_str)
                 
                 # And then data of every bond of this atom in second list
                 for bond in obab.OBAtomBondIter(atom):
-                    bond_str = f'BOND {bond.GetBeginAtom().GetType()} {bond.GetEndAtom().GetType()} {bond.GetBondOrder()}'
+                    atom1, atom2 = bond.GetBeginAtom(), bond.GetEndAtom()
+                    bond_str = f'BOND {atom1.GetResidue().GetAtomID(atom1)} {atom2.GetResidue().GetAtomID(atom2)} {bond.GetBondOrder()}'
                     residues[res_name][1].append(bond_str)
 
     return residues
